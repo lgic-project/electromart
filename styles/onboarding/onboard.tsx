@@ -15,7 +15,8 @@ export const styles = StyleSheet.create({
   },
   logo: {
     width: wp("23%"),
-    height: hp("10%"),
+  height: hp("10%"),
+    resizeMode: "contain",
   },
   titleWrapper: {
     flexDirection: "row",

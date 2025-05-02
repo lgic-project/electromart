@@ -12,7 +12,7 @@ import OnBoarding from './(routes)/onboarding/index'; // ✅ Corrected Import
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const [loaded, error] = useFonts({
+  const[loaded, error] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
     ...FontAwesome.font,
   });

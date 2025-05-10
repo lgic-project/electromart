@@ -25,6 +25,7 @@ export const styles = StyleSheet.create({
     position: "absolute",
     left: -28,
     top: -20,
+    resizeMode: "contain",
   },
   titleText: {
     fontSize: hp("4%"),
@@ -34,10 +35,13 @@ export const styles = StyleSheet.create({
     position: "absolute",
     right: -40,
     top: -20,
+    resizeMode: "center",
+    marginBottom: 20,
   },
   titleShape3: {
     position: "absolute",
     left: 60,
+    resizeMode: "center",
   },
   dscpWrapper: {
     marginTop: 30,

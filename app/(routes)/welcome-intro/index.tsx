@@ -1,11 +1,14 @@
 import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import {Stack} from "expo-router";
 
 export default function index() {
   return (
-    <View>
-      <Text>index</Text>
-    </View>
+     <><>
+      <Stack.Screen options={{ headerShown: false }} />
+
+    </><View>
+        <Text>index</Text>
+      </View></>
   )
 }
 

@@ -34,7 +34,10 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <View style={styles.container}>
         <Stack>
-          <Slot /> {/* ✅ Ensure Slot is rendered */}
+          
+          <Stack.Screen name="(routes)/login/index" options={{ headerShown: false }} />
+     <Stack.Screen name="(routes)/onboarding/index" options={{ headerShown: false }} />
+
         </Stack>
         <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
       </View>

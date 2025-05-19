@@ -51,6 +51,9 @@ export const styles = StyleSheet.create({
     color: "#575757",
     fontSize: hp("2%"),
   },
+  signInImage:{
+    
+  },
   buttonWrapper: {
     backgroundColor: "#2467EC",
     width: wp("92%"),

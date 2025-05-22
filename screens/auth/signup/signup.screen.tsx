@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import {
+  AntDesign,
   Entypo,
   FontAwesome,
   Fontisto,
@@ -27,15 +28,16 @@ import {
   Nunito_700Bold,
   Nunito_600SemiBold,
 } from "@expo-google-fonts/nunito";
-
-import React, { useState } from 'react'
-import { router } from "expo-router";
+import { useState } from "react";
 import { commonStyles } from "@/styles/common/common.styles";
+import { router } from "expo-router";
 
-export default function LoginScreen() {
-      const [isPasswordVisible, setPasswordVisible] = useState(false);
+
+export default function SignUpScreen() {
+  const [isPasswordVisible, setPasswordVisible] = useState(false);
   const [buttonSpinner, setButtonSpinner] = useState(false);
   const [userInfo, setUserInfo] = useState({
+    name: "",
     email: "",
     password: "",
   });
@@ -43,7 +45,8 @@ export default function LoginScreen() {
   const [error, setError] = useState({
     password: "",
   });
-    let [fontsLoaded, fontError] = useFonts({
+
+  let [fontsLoaded, fontError] = useFonts({
     Raleway_600SemiBold,
     Raleway_700Bold,
     Nunito_400Regular,
@@ -55,23 +58,76 @@ export default function LoginScreen() {
   if (!fontsLoaded && !fontError) {
     return null;
   }
+
+  const handlePasswordValidation = (value: string) => {
+    const password = value;
+    const passwordSpecialCharacter = /(?=.*[!@#$&*])/;
+    const passwordOneNumber = /(?=.*[0-9])/;
+    const passwordSixValue = /(?=.{6,})/;
+
+    if (!passwordSpecialCharacter.test(password)) {
+      setError({
+        ...error,
+        password: "Write at least one special character",
+      });
+      setUserInfo({ ...userInfo, password: "" });
+    } else if (!passwordOneNumber.test(password)) {
+      setError({
+        ...error,
+        password: "Write at least one number",
+      });
+      setUserInfo({ ...userInfo, password: "" });
+    } else if (!passwordSixValue.test(password)) {
+      setError({
+        ...error,
+        password: "Write at least 6 characters",
+      });
+      setUserInfo({ ...userInfo, password: "" });
+    } else {
+      setError({
+        ...error,
+        password: "",
+      });
+      setUserInfo({ ...userInfo, password: value });
+    }
+  };
+
+ 
+
   return (
     <LinearGradient
-       colors={["#E5ECF9", "#F6F7F9"]}
+      colors={["#E5ECF9", "#F6F7F9"]}
       style={{ flex: 1, paddingTop: 20 }}
     >
-        <ScrollView>
-             <Image
-          style={styles.signInImage}
-          source={require("@/assets/onboarding/shape_2.png")}
-        />
-          <Text style={[styles.welcomeText, { fontFamily: "Raleway_700Bold" }]}>
-          Welcome Back!
+       <ScrollView>
+                   <Image
+                style={styles.signInImage}
+                source={require("@/assets/onboarding/shape_2.png")}
+              />
+        <Text style={[styles.welcomeText, { fontFamily: "Raleway_700Bold" }]}>
+          Let's get started!
         </Text>
         <Text style={styles.learningText}>
-          Login to your existing account of gadgetapp
+          Create an account to gadgetapp to get all features
         </Text>
         <View style={styles.inputContainer}>
+          <View>
+            <TextInput
+              style={[styles.input, { paddingLeft: 40, marginBottom: -12 }]}
+              keyboardType="default"
+              value={userInfo.name}
+              placeholder="Your Full name"
+              onChangeText={(value) =>
+                setUserInfo({ ...userInfo, name: value })
+              }
+            />
+            <AntDesign
+              style={{ position: "absolute", left: 26, top: 14 }}
+              name="user"
+              size={20}
+              color={"#A1A1A1"}
+            />
+          </View>
           <View>
             <TextInput
               style={[styles.input, { paddingLeft: 40 }]}
@@ -99,8 +155,8 @@ export default function LoginScreen() {
                 keyboardType="default"
                 secureTextEntry={!isPasswordVisible}
                 defaultValue=""
-                placeholder="********"
-                
+                placeholder="******"
+                onChangeText={handlePasswordValidation}
               />
               <TouchableOpacity
                 style={styles.visibleIcon}
@@ -131,18 +187,6 @@ export default function LoginScreen() {
                 </Text>
               </View>
             )}
-            <TouchableOpacity
-              
-            >
-              <Text
-                style={[
-                  styles.forgotSection,
-                  { fontFamily: "Nunito_600SemiBold" },
-                ]}
-              >
-                Forgot Password?
-              </Text>
-            </TouchableOpacity>
 
             <TouchableOpacity
               style={{
@@ -165,7 +209,7 @@ export default function LoginScreen() {
                     fontFamily: "Raleway_700Bold",
                   }}
                 >
-                  Sign In
+                  Sign Up
                 </Text>
               )}
             </TouchableOpacity>
@@ -182,19 +226,16 @@ export default function LoginScreen() {
               <TouchableOpacity>
                 <FontAwesome name="google" size={30} />
               </TouchableOpacity>
-                <TouchableOpacity>
-                    <FontAwesome name="facebook" size={30} />
-                    </TouchableOpacity>
+              <TouchableOpacity>
+                <FontAwesome name="facebook" size={30} />
+              </TouchableOpacity>
             </View>
 
             <View style={styles.signupRedirect}>
               <Text style={{ fontSize: 18, fontFamily: "Raleway_600SemiBold" }}>
-                Don't have an account?
+                Already have an account?
               </Text>
-              <TouchableOpacity
-              onPress={() => router.push("./sign-up")}
-               
-              >
+              <TouchableOpacity onPress={() => router.push("/(routes)/login")}>
                 <Text
                   style={{
                     fontSize: 18,
@@ -203,17 +244,15 @@ export default function LoginScreen() {
                     marginLeft: 5,
                   }}
                 >
-                  Sign Up
+                  Sign In
                 </Text>
               </TouchableOpacity>
             </View>
           </View>
         </View>
-            
-        </ScrollView>
-        
+      </ScrollView>
     </LinearGradient>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -223,7 +262,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     marginTop: 0,
   },
-    welcomeText: {
+  welcomeText: {
     textAlign: "center",
     fontSize: 24,
   },

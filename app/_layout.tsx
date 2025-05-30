@@ -38,6 +38,7 @@ export default function RootLayout() {
      <Stack.Screen name="(routes)/onboarding/index" options={{ headerShown: false }} />
      <Stack.Screen name="(routes)/sign-up/index" options={{ headerShown: false }} />
 
+<Stack.Screen name="(routes)/sign-up/index" options={{ headerShown: false }} />
         </Stack>
         <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
       </View>

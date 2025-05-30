@@ -9,7 +9,6 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Stack, Slot } from 'expo-router'; // ✅ Import Slot
 
 SplashScreen.preventAutoHideAsync();
-
 export default function RootLayout() {
   const [loaded, error] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
@@ -37,6 +36,7 @@ export default function RootLayout() {
           
           <Stack.Screen name="(routes)/login/index" options={{ headerShown: false }} />
      <Stack.Screen name="(routes)/onboarding/index" options={{ headerShown: false }} />
+     <Stack.Screen name="(routes)/sign-up/index" options={{ headerShown: false }} />
 
         </Stack>
         <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />

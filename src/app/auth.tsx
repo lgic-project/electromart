@@ -72,3 +72,89 @@ export default function Auth()
 
       
 
+return(
+    <ImageBackground 
+      source={{
+        uri: 'https://images.pexels.com/photos/682933/pexels-photo-682933.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      }}
+      style={styles.backgroundImage}
+      >
+      <View style={styles.overlay} />
+
+      <Stack.Screen options= {{headerShown: false}} />
+
+      <View style={styles.container}>
+        <Text style={styles.title}>Welcome</Text>
+        <Text style={styles.subtitle}>Please Authenticate to continue</Text>
+
+        <Controller
+          control={control}
+          name='email'
+          render={({
+            field: { value, onChange, onBlur },
+            fieldState: { error },
+          }) => (
+            <>
+              <TextInput
+                placeholder='Email'
+                style={styles.input}
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                placeholderTextColor='#aaa'
+                autoCapitalize='none'
+                editable={!formState.isSubmitting}
+              />
+              {error && <Text style={styles.error}>{error.message}</Text>}
+            </>
+          )}
+        />
+
+
+<Controller
+          control={control}
+          name='password'
+          render={({
+            field: { value, onChange, onBlur },
+            fieldState: { error },
+          }) => (
+            <>
+              <TextInput
+                placeholder='Password'
+                style={styles.input}
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                secureTextEntry
+                placeholderTextColor='#aaa'
+                autoCapitalize='none'
+                editable={!formState.isSubmitting}
+              />
+              {error && <Text style={styles.error}>{error.message}</Text>}
+            </>
+          )}
+        />
+
+<TouchableOpacity
+          style={styles.button}
+          onPress={handleSubmit(signIn)}
+          disabled={formState.isSubmitting}
+        >
+          <Text style={styles.buttonText}>Sign In</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.button, styles.signUpButton]}
+          onPress={handleSubmit(signUp)}
+          disabled={formState.isSubmitting}
+        >
+          <Text style={styles.buttonText}>Sign Up</Text>
+        </TouchableOpacity>
+        </View>
+
+
+
+
+      </ImageBackground>
+    )
+}
+

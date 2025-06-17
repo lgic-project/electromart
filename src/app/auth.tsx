@@ -14,7 +14,7 @@ import {
 import { supabase } from '../lib/supabase';
 import { Toast } from 'react-native-toast-notifications';
 import { useAuth } from '../providers/auth-provider';
-
+import React from 'react';
 
   const authSchema = zod.object({
     email: zod.string().email({ message: 'Invalid email address' }),
@@ -158,3 +158,12 @@ return(
     )
 }
 
+const styles = StyleSheet.create({
+    backgroundImage: {
+      flex: 1,
+      resizeMode: 'cover',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+  
+  });

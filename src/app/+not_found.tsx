@@ -22,3 +22,10 @@ const styles = StyleSheet.create({
 
 // Stylesheet used for styling the components within the screen
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,                       // Takes full height of the screen
+    justifyContent: 'center',     // Centers content vertically
+    alignItems: 'center',         // Centers content horizontally
+    backgroundColor: '#f8f8f8',   // Light gray background
+    padding: 20,                  // Adds padding around the content
+  },

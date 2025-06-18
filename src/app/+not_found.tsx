@@ -35,3 +35,9 @@ const styles = StyleSheet.create({
     color: '#333',               // Dark gray color for the text
     textAlign: 'center',         // Center-aligned text
   },
+   link: {
+    fontSize: 16,                // Font size for the link text
+    color: '#007AFF',           // iOS-style blue link color
+    textDecorationLine: 'underline', // Underline the link
+  },
+});

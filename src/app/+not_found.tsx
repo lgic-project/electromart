@@ -18,3 +18,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 });
+
+
+// Stylesheet used for styling the components within the screen
+const styles = StyleSheet.create({

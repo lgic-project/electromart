@@ -29,3 +29,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8f8f8',   // Light gray background
     padding: 20,                  // Adds padding around the content
   },
+  message: {
+    fontSize: 18,                 // Slightly larger font size for readability
+    marginBottom: 20,            // Adds space below the message
+    color: '#333',               // Dark gray color for the text
+    textAlign: 'center',         // Center-aligned text
+  },

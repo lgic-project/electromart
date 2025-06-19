@@ -51,3 +51,19 @@ const ProductDetails = () => {
       decrementItem(product.id);
     }
   };
+
+  const addToCart = () => {
+    addItem({
+      id: product.id,
+      title: product.title,
+      heroImage: product.heroImage,
+      price: product.price,
+      quantity,
+      maxQuantity: product.maxQuantity,
+    });
+    toast.show('Added to cart', {
+      type: 'success',
+      placement: 'top',
+      duration: 1500,
+    });
+  };

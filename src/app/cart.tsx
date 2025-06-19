@@ -85,3 +85,14 @@ const ProductDetails = () => {
           </Text>
           <Text style={styles.price}>Total Price: Rs{totalPrice}</Text>
         </View>
+
+<FlatList
+          data={product.imagesUrl}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item }) => (
+            <Image source={{ uri: item }} style={styles.image} />
+          )}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.imagesContainer}
+        />

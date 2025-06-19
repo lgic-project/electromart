@@ -44,3 +44,10 @@ const ProductDetails = () => {
       });
     }
   };
+
+  const decreaseQuantity = () => {
+    if (quantity > 1) {
+      setQuantity(prev => prev - 1);
+      decrementItem(product.id);
+    }
+  };

@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { supabase } from '../lib/supabase';
-import {act} from 'react';
+
 
 export const useOrderUpdateSubscription = () => {
   const queryClient = useQueryClient();
@@ -17,7 +17,6 @@ export const useOrderUpdateSubscription = () => {
           console.log('Change received!', payload);
           queryClient.invalidateQueries({
             queryKey: ['orders'],
-            .queryKey: ['order', payload.new.id],
           });
         }
       )

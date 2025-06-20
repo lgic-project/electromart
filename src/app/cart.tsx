@@ -1,4 +1,4 @@
-import { Redirect, Stack, useLocalSearchParams } from 'expo-router';
+mport { Redirect, Stack, useLocalSearchParams } from 'expo-router';
 import {
   FlatList,
   Image,
@@ -66,7 +66,7 @@ const ProductDetails = () => {
       placement: 'top',
       duration: 1500,
     });
-  }; 
+  };
 
   const totalPrice = (product.price * quantity).toFixed(2);
 
@@ -86,7 +86,7 @@ const ProductDetails = () => {
           <Text style={styles.price}>Total Price: Rs{totalPrice}</Text>
         </View>
 
-<FlatList
+        <FlatList
           data={product.imagesUrl}
           keyExtractor={(item, index) => index.toString()}
           renderItem={({ item }) => (
@@ -96,3 +96,51 @@ const ProductDetails = () => {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.imagesContainer}
         />
+
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            style={styles.quantityButton}
+            onPress={decreaseQuantity}
+            disabled={quantity <= 1}
+          >
+            <Text style={styles.quantityButtonText}>-</Text>
+          </TouchableOpacity>
+
+          <Text style={styles.quantity}>{quantity}</Text>
+
+          <TouchableOpacity
+            style={styles.quantityButton}
+            onPress={increaseQuantity}
+            disabled={quantity >= product.maxQuantity}
+          >
+            <Text style={styles.quantityButtonText}>+</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.addToCartButton,
+              { opacity: quantity === 0 ? 0.5 : 1 },
+            ]}
+            onPress={addToCart}
+            disabled={quantity === 0}
+          >
+            <Text style={styles.addToCartText}>Add to Cart</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </View>
+  );
+};
+
+export default ProductDetails;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  heroImage: {
+    width: '100%',
+    height: 250,
+    resizeMode: 'cover',
+  },

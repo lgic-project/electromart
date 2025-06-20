@@ -1,98 +1,244 @@
-import { Redirect, Stack, useLocalSearchParams } from 'expo-router';
 import {
+  View,
+  Text,
+  StyleSheet,
+  Alert,
+  Platform,
+  TouchableOpacity,
   FlatList,
   Image,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
 } from 'react-native';
-import { useToast } from 'react-native-toast-notifications';
-import { useState } from 'react';
+import { useCartStore } from '../store/cart-store';
+import { StatusBar } from 'expo-status-bar';
+import { createOrder, createOrderItem } from '../api/api';
 
-import { useCartStore } from '../../store/cart-store';
-import { getProduct } from '../../api/api';
-import { ActivityIndicator } from 'react-native';
+type CartItemType = {
+  id: number;
+  title: string;
+  heroImage: string;
+  price: number;
+  quantity: number;
+  maxQuantity: number;
+};
 
-const ProductDetails = () => {
-  const { slug } = useLocalSearchParams<{ slug: string }>();
-  const toast = useToast();
+type CartItemProps = {
+  item: CartItemType;
+  onRemove: (id: number) => void;
+  onIncrement: (id: number) => void;
+  onDecrement: (id: number) => void;
+};
 
-  const { data: product, error, isLoading } = getProduct(slug);
+const CartItem = ({
+  item,
+  onDecrement,
+  onIncrement,
+  onRemove,
+}: CartItemProps) => {
+  return (
+    <View style={styles.cartItem}>
+      <Image source={{ uri: item.heroImage }} style={styles.itemImage} />
+      <View style={styles.itemDetails}>
+        <Text style={styles.itemTitle}>{item.title}</Text>
+        <Text style={styles.itemPrice}>Rs {item.price.toFixed(2)}</Text>
+        <View style={styles.quantityContainer}>
+          <TouchableOpacity
+            onPress={() => onDecrement(item.id)}
+            style={styles.quantityButton}
+          >
+            <Text style={styles.quantityButtonText}>-</Text>
+          </TouchableOpacity>
+          <Text style={styles.itemQuantity}>{item.quantity}</Text>
+          <TouchableOpacity
+            onPress={() => onIncrement(item.id)}
+            style={styles.quantityButton}
+          >
+            <Text style={styles.quantityButtonText}>+</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
 
-  const { items, addItem, incrementItem, decrementItem } = useCartStore();
+      <TouchableOpacity
+        onPress={() => onRemove(item.id)}
+        style={styles.removeButton}
+      >
+        <Text style={styles.removeButtonText}>Remove</Text>
+      </TouchableOpacity>
+    </View>
+  );
+};
 
-  const cartItem = items.find(item => item.id === product?.id);
+export default function Cart() {
+  const {
+    items,
+    removeItem,
+    incrementItem,
+    decrementItem,
+    getTotalPrice,
+    resetCart,
+  } = useCartStore();
 
-  const initialQuantity = cartItem ? cartItem.quantity : 0;
+  const { mutateAsync: createSupabaseOrder } = createOrder();
+  const { mutateAsync: createSupabaseOrderItem } = createOrderItem();
 
-  const [quantity, setQuantity] = useState(initialQuantity);
+  const handleCheckout = async () => {
+    const totalPrice = parseFloat(getTotalPrice());
 
-  if (isLoading) return <ActivityIndicator />;
-  if (error) return <Text>Error: {error.message}</Text>;
-  if (!product) return <Redirect href='/404' />;
+    if (isNaN(totalPrice) || totalPrice <= 0) {
+      Alert.alert('Error', 'Invalid total price');
+      return;
+    }
 
-  const increaseQuantity = () => {
-    if (quantity < product.maxQuantity) {
-      setQuantity(prev => prev + 1);
-      incrementItem(product.id);
-    } else {
-      toast.show('Cannot add more than maximum quantity', {
-        type: 'warning',
-        placement: 'top',
-        duration: 1500,
-      });
+    try {
+      const orderData = await createSupabaseOrder({ totalPrice });
+
+      // ✅ SAFETY CHECK
+      if (!orderData || !orderData.id) {
+        Alert.alert('Error', 'Order creation failed. Try again.');
+        return;
+      }
+
+      const validItems = items.filter(
+        (item) => item && item.id != null && item.quantity > 0
+      );
+
+      if (validItems.length === 0) {
+        Alert.alert('Error', 'No valid items in cart');
+        return;
+      }
+
+      await createSupabaseOrderItem(
+        validItems.map((item) => ({
+          orderId: orderData.id,
+          productId: item.id,
+          quantity: item.quantity,
+        }))
+      );
+
+      Alert.alert('Success', 'Order created successfully');
+      resetCart();
+    } catch (error) {
+      console.error('Error creating order:', error);
+      Alert.alert('Error', 'Failed to create order');
     }
   };
-
-  const decreaseQuantity = () => {
-    if (quantity > 1) {
-      setQuantity(prev => prev - 1);
-      decrementItem(product.id);
-    }
-  };
-
-  const addToCart = () => {
-    addItem({
-      id: product.id,
-      title: product.title,
-      heroImage: product.heroImage,
-      price: product.price,
-      quantity,
-      maxQuantity: product.maxQuantity,
-    });
-    toast.show('Added to cart', {
-      type: 'success',
-      placement: 'top',
-      duration: 1500,
-    });
-  }; 
-
-  const totalPrice = (product.price * quantity).toFixed(2);
 
   return (
     <View style={styles.container}>
-      <Stack.Screen options={{ title: product.title }} />
+      <StatusBar style={Platform.OS === 'android' ? 'light' : 'auto'} />
 
-      <Image source={{ uri: product.heroImage }} style={styles.heroImage} />
+      <FlatList
+        data={items}
+        keyExtractor={(item) => item?.id?.toString() ?? Math.random().toString()}
+        renderItem={({ item }) =>
+          item ? (
+            <CartItem
+              item={item}
+              onRemove={removeItem}
+              onIncrement={incrementItem}
+              onDecrement={decrementItem}
+            />
+          ) : null
+        }
+        contentContainerStyle={styles.cartList}
+      />
 
-      <View style={{ padding: 16, flex: 1 }}>
-        <Text style={styles.title}>Title: {product.title}</Text>
-        <Text style={styles.slug}>Slug: {product.slug}</Text>
-        <View style={styles.priceContainer}>
-          <Text style={styles.price}>
-            Unit Price: Rs{product.price.toFixed(2)}
-          </Text>
-          <Text style={styles.price}>Total Price: Rs{totalPrice}</Text>
-        </View>
+      <View style={styles.footer}>
+        <Text style={styles.totalText}>Total: Rs {getTotalPrice()}</Text>
+        <TouchableOpacity onPress={handleCheckout} style={styles.checkoutButton}>
+          <Text style={styles.checkoutButtonText}>Checkout</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
 
-<FlatList
-          data={product.imagesUrl}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={({ item }) => (
-            <Image source={{ uri: item }} style={styles.image} />
-          )}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.imagesContainer}
-        />
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    paddingHorizontal: 16,
+  },
+  cartList: {
+    paddingVertical: 16,
+  },
+  cartItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+    padding: 16,
+    borderRadius: 8,
+    backgroundColor: '#f9f9f9',
+  },
+  itemImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+  },
+  itemDetails: {
+    flex: 1,
+    marginLeft: 16,
+  },
+  itemTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  itemPrice: {
+    fontSize: 16,
+    color: '#888',
+    marginBottom: 4,
+  },
+  itemQuantity: {
+    fontSize: 14,
+    color: '#666',
+  },
+  removeButton: {
+    padding: 8,
+    backgroundColor: '#ff5252',
+    borderRadius: 8,
+  },
+  removeButtonText: {
+    color: '#fff',
+    fontSize: 14,
+  },
+  footer: {
+    borderTopWidth: 1,
+    borderColor: '#ddd',
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    alignItems: 'center',
+  },
+  totalText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 16,
+  },
+  checkoutButton: {
+    backgroundColor: '#28a745',
+    paddingVertical: 12,
+    paddingHorizontal: 32,
+    borderRadius: 8,
+  },
+  checkoutButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  quantityContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  quantityButton: {
+    width: 30,
+    height: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 15,
+    backgroundColor: '#ddd',
+    marginHorizontal: 5,
+  },
+  quantityButtonText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+});

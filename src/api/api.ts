@@ -12,7 +12,11 @@ export const getProductsAndCategories = () => {
         supabase.from('category').select('*'),
       ]);
 
-     
+      if (products.error || categories.error) {
+        throw new Error('An error occurred while fetching data');
+      }
+
+      return { products: products.data, categories: categories.data };
     },
   });
 };

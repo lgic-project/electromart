@@ -154,3 +154,13 @@ const styles = StyleSheet.create({
     color: '#555',
     marginBottom: 16,
   },
+   priceContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  price: {
+    fontWeight: 'bold',
+    color: '#000',
+  },

@@ -1,4 +1,4 @@
-import { Redirect, Stack, useLocalSearchParams } from 'expo-router';
+mport { Redirect, Stack, useLocalSearchParams } from 'expo-router';
 import {
   FlatList,
   Image,
@@ -130,4 +130,4 @@ const ProductDetails = () => {
       </View>
     </View>
   );
-}
+};

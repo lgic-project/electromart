@@ -149,3 +149,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginVertical: 8,
   },
+  slug: {
+    fontSize: 18,
+    color: '#555',
+    marginBottom: 16,
+  },

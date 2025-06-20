@@ -131,3 +131,16 @@ const ProductDetails = () => {
     </View>
   );
 };
+
+export default ProductDetails;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  heroImage: {
+    width: '100%',
+    height: 250,
+    resizeMode: 'cover',
+  },

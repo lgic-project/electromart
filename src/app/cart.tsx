@@ -66,4 +66,33 @@ const ProductDetails = () => {
       placement: 'top',
       duration: 1500,
     });
-  };
+  }; 
+
+  const totalPrice = (product.price * quantity).toFixed(2);
+
+  return (
+    <View style={styles.container}>
+      <Stack.Screen options={{ title: product.title }} />
+
+      <Image source={{ uri: product.heroImage }} style={styles.heroImage} />
+
+      <View style={{ padding: 16, flex: 1 }}>
+        <Text style={styles.title}>Title: {product.title}</Text>
+        <Text style={styles.slug}>Slug: {product.slug}</Text>
+        <View style={styles.priceContainer}>
+          <Text style={styles.price}>
+            Unit Price: Rs{product.price.toFixed(2)}
+          </Text>
+          <Text style={styles.price}>Total Price: Rs{totalPrice}</Text>
+        </View>
+
+<FlatList
+          data={product.imagesUrl}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item }) => (
+            <Image source={{ uri: item }} style={styles.image} />
+          )}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.imagesContainer}
+        />

@@ -9,7 +9,7 @@ export const getProductsAndCategories = () => {
     queryFn: async () => {
       const [products, categories] = await Promise.all([
         supabase.from('product').select('*'),
-        supabase.from('categories').select('*'),
+        supabase.from('category').select('*'),
       ]);
 
      

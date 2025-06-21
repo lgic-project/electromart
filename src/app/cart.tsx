@@ -164,3 +164,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#000',
   },
+
+  imagesContainer: {
+    marginBottom: 16,
+  },
+  image: {
+    width: 100,
+    height: 100,
+    marginRight: 8,
+    borderRadius: 8,
+  },

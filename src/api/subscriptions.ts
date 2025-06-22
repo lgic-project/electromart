@@ -3,7 +3,6 @@ import { useQueryClient } from '@tanstack/react-query';
 
 import { supabase } from '../lib/supabase';
 
-
 export const useOrderUpdateSubscription = () => {
   const queryClient = useQueryClient();
 

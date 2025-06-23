@@ -133,7 +133,6 @@ const ProductDetails = () => {
 };
 
 export default ProductDetails;
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,

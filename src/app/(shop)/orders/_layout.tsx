@@ -3,6 +3,7 @@ import { useOrderUpdateSubscription } from "../../../api/subscriptions";
 
 export default function OrdersLayout()
 {
+    
     useOrderUpdateSubscription();
    return(
     <Stack>

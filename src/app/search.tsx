@@ -8,7 +8,7 @@ import {
   Pressable,
   Image,
 } from 'react-native';
-import { Link, useRouter } from 'expo-router';
+import { Link, useRouter, useLocalSearchParams } from 'expo-router';
 
 import { getProductsAndCategories } from '../api/api';
 import { Tables } from '../types/database.types';
@@ -20,7 +20,18 @@ export default function Search() {
   const [filteredCategories, setFilteredCategories] = useState<Tables<'category'>[]>([]);
   const { data } = getProductsAndCategories();
   const router = useRouter();
+  
+  // Get the search query from route parameters
+  const { query: routeQuery } = useLocalSearchParams<{ query: string }>();
 
+  // Set initial query from route parameters when component mounts
+  useEffect(() => {
+    if (routeQuery && typeof routeQuery === 'string') {
+      setQuery(routeQuery);
+    }
+  }, [routeQuery]);
+
+  // Filter products and categories based on query
   useEffect(() => {
     if (!data || !query.trim()) {
       setFilteredProducts([]);
@@ -42,49 +53,81 @@ export default function Search() {
     setFilteredCategories(matchedCategories);
   }, [query, data]);
 
+  // Update the route parameter when user types in the search box
+  const handleQueryChange = (newQuery: string) => {
+    setQuery(newQuery);
+    
+    // Update the URL parameter to maintain consistency
+    if (newQuery.trim()) {
+      router.setParams({ query: newQuery });
+    }
+  };
+
   return (
     <View style={styles.container}>
       <TextInput
         style={styles.input}
         placeholder="Search products or categories"
         value={query}
-        onChangeText={setQuery}
+        onChangeText={handleQueryChange}
       />
 
-      <Text style={styles.sectionTitle}>Categories</Text>
-      <FlatList
-        data={filteredCategories}
-        keyExtractor={item => item.id.toString()}
-        renderItem={({ item }) => (
-          <Link href={`/categories/${item.slug}`} asChild>
-            <Pressable style={styles.categoryItem}>
-              <Image source={{ uri: item.imageUrl }} style={styles.categoryImage} />
-              <Text style={styles.categoryName}>{item.name}</Text>
-            </Pressable>
-          </Link>
-        )}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-      />
+      {query.trim() && (
+        <>
+          {filteredCategories.length > 0 && (
+            <>
+              <Text style={styles.sectionTitle}>Categories</Text>
+              <FlatList
+                data={filteredCategories}
+                keyExtractor={item => item.id.toString()}
+                renderItem={({ item }) => (
+                  <Link href={`/categories/${item.slug}`} asChild>
+                    <Pressable style={styles.categoryItem}>
+                      <Image source={{ uri: item.imageUrl }} style={styles.categoryImage} />
+                      <Text style={styles.categoryName}>{item.name}</Text>
+                    </Pressable>
+                  </Link>
+                )}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={styles.categoriesList}
+              />
+            </>
+          )}
 
-      <Text style={styles.sectionTitle}>Products</Text>
-      <FlatList
-        data={filteredProducts}
-        keyExtractor={item => item.id.toString()}
-        renderItem={({ item }) => <ProductListItem product={item} />}
-        numColumns={2}
-        ListEmptyComponent={
-          query ? (
-            <Link href="/components/+not-found" asChild>
-              <Pressable>
-                <Text style={styles.noResultText}>No results found. Tap to return.</Text>
-              </Pressable>
-            </Link>
-          ) : null
-        }
-        contentContainerStyle={styles.listContent}
-        columnWrapperStyle={styles.columnWrapper}
-      />
+          <Text style={styles.sectionTitle}>Products</Text>
+          <FlatList
+            data={filteredProducts}
+            keyExtractor={item => item.id.toString()}
+            renderItem={({ item }) => <ProductListItem product={item} />}
+            numColumns={2}
+            ListEmptyComponent={
+              filteredProducts.length === 0 && filteredCategories.length === 0 ? (
+                <View style={styles.noResultContainer}>
+                  <Text style={styles.noResultText}>
+                    No results found for "{query}"
+                  </Text>
+                  <Link href="/" asChild>
+                    <Pressable style={styles.backButton}>
+                      <Text style={styles.backButtonText}>Back to Home</Text>
+                    </Pressable>
+                  </Link>
+                </View>
+              ) : null
+            }
+            contentContainerStyle={styles.listContent}
+            columnWrapperStyle={filteredProducts.length > 1 ? styles.columnWrapper : undefined}
+          />
+        </>
+      )}
+
+      {!query.trim() && (
+        <View style={styles.emptyStateContainer}>
+          <Text style={styles.emptyStateText}>
+            Start typing to search for products and categories
+          </Text>
+        </View>
+      )}
     </View>
   );
 }
@@ -101,11 +144,15 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 8,
     marginBottom: 16,
+    fontSize: 16,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     marginVertical: 10,
+  },
+  categoriesList: {
+    marginBottom: 10,
   },
   categoryItem: {
     marginRight: 16,
@@ -119,12 +166,38 @@ const styles = StyleSheet.create({
   categoryName: {
     marginTop: 6,
     fontSize: 14,
+    textAlign: 'center',
+  },
+  noResultContainer: {
+    alignItems: 'center',
+    marginTop: 40,
   },
   noResultText: {
-    marginTop: 16,
     fontSize: 16,
     textAlign: 'center',
     color: 'gray',
+    marginBottom: 20,
+  },
+  backButton: {
+    backgroundColor: '#1BC464',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  backButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  emptyStateContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyStateText: {
+    fontSize: 16,
+    color: 'gray',
+    textAlign: 'center',
   },
   listContent: {
     paddingBottom: 20,

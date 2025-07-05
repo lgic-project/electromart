@@ -34,33 +34,24 @@ export const ListHeader = ({
 
     if (!search) return;
 
-    const { data: productData } = await supabase
-      .from('product')
-      .select('*')
-      .ilike('title', `%${search}%`);
-
-    const { data: categoryData } = await supabase
-      .from('category')
-      .select('*')
-      .ilike('name', `%${search}%`);
-
-    if ((productData && productData.length > 0) || (categoryData && categoryData.length > 0)) {
-      router.push({
-        pathname: '/search',
-        params: {
-          query: search,
-        },
-      });
-    } else {
-      router.push('/searchnotfound');
-    }
+    // Always navigate to search page with the query parameter
+    // Remove the database check since we'll handle filtering on the search page
+    router.push({
+      pathname: '/search',
+      params: {
+        query: search,
+      },
+    });
   };
 
   return (
     <View style={styles.headerContainer}>
-      {/* Top Row: Greeting Text + Cart + Logout */}
+      {/* Top Row: Logo + Cart + Logout */}
       <View style={styles.topButtonsRow}>
-        <Text style={styles.greetingText}>Hello, Ganesh</Text>
+        <Image
+          source={require('../../assets/loogo.png')}
+          style={styles.logoImage}
+        />
         <View style={styles.iconRow}>
           <Link href="/cart" asChild>
             <Pressable style={styles.iconButton}>
@@ -146,9 +137,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 10,
   },
-  greetingText: {
-    fontSize: 16,
-    color: 'black',
+  logoImage: {
+    width: 180,
+    height: 60,
+    resizeMode: 'contain',
+    marginLeft: -50,
   },
   iconRow: {
     flexDirection: 'row',

@@ -133,9 +133,7 @@ export default function Auth() {
           <Text style={styles.buttonText}>Sign In</Text>
         </TouchableOpacity>
 
-        <Pressable onPress={() => console.log('Forgot Password')}>
-          <Text style={styles.linkText}>Forgot Password?</Text>
-        </Pressable>
+       
 
         <Pressable onPress={() => router.push('/sign-up-auth')}>
           <Text style={styles.linkText}>Don't have an account? Sign Up</Text>

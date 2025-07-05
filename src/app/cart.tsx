@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { useCartStore } from '../store/cart-store';
 import { StatusBar } from 'expo-status-bar';
-import { createOrder, createOrderItem } from '../api/api';
+import { router } from 'expo-router';
 
 type CartItemType = {
   id: number;
@@ -39,7 +39,7 @@ const CartItem = ({
       <Image source={{ uri: item.heroImage }} style={styles.itemImage} />
       <View style={styles.itemDetails}>
         <Text style={styles.itemTitle}>{item.title}</Text>
-        <Text style={styles.itemPrice}>Rs {item.price.toFixed(2)}</Text>
+        <Text style={styles.itemPrice}>$ {item.price.toFixed(2)}</Text>
         <View style={styles.quantityContainer}>
           <TouchableOpacity
             onPress={() => onDecrement(item.id)}
@@ -74,13 +74,15 @@ export default function Cart() {
     incrementItem,
     decrementItem,
     getTotalPrice,
-    resetCart,
   } = useCartStore();
 
-  const { mutateAsync: createSupabaseOrder } = createOrder();
-  const { mutateAsync: createSupabaseOrderItem } = createOrderItem();
+  const handleCheckout = () => {
+    // Validate cart items
+    if (items.length === 0) {
+      Alert.alert('Error', 'Your cart is empty');
+      return;
+    }
 
-  const handleCheckout = async () => {
     const totalPrice = parseFloat(getTotalPrice());
 
     if (isNaN(totalPrice) || totalPrice <= 0) {
@@ -88,38 +90,23 @@ export default function Cart() {
       return;
     }
 
-    try {
-      const orderData = await createSupabaseOrder({ totalPrice });
+    // Validate items have required fields
+    const validItems = items.filter(
+      (item) => item && item.id != null && item.quantity > 0
+    );
 
-      // ✅ SAFETY CHECK
-      if (!orderData || !orderData.id) {
-        Alert.alert('Error', 'Order creation failed. Try again.');
-        return;
-      }
-
-      const validItems = items.filter(
-        (item) => item && item.id != null && item.quantity > 0
-      );
-
-      if (validItems.length === 0) {
-        Alert.alert('Error', 'No valid items in cart');
-        return;
-      }
-
-      await createSupabaseOrderItem(
-        validItems.map((item) => ({
-          orderId: orderData.id,
-          productId: item.id,
-          quantity: item.quantity,
-        }))
-      );
-
-      Alert.alert('Success', 'Order created successfully');
-      resetCart();
-    } catch (error) {
-      console.error('Error creating order:', error);
-      Alert.alert('Error', 'Failed to create order');
+    if (validItems.length === 0) {
+      Alert.alert('Error', 'No valid items in cart');
+      return;
     }
+
+    // Navigate to payment screen with total amount
+    router.push({
+      pathname: '/payment',
+      params: { 
+        totalAmount: totalPrice.toString() 
+      }
+    });
   };
 
   return (
@@ -143,7 +130,7 @@ export default function Cart() {
       />
 
       <View style={styles.footer}>
-        <Text style={styles.totalText}>Total: Rs {getTotalPrice()}</Text>
+        <Text style={styles.totalText}>Total: ${getTotalPrice()}</Text>
         <TouchableOpacity onPress={handleCheckout} style={styles.checkoutButton}>
           <Text style={styles.checkoutButtonText}>Checkout</Text>
         </TouchableOpacity>
